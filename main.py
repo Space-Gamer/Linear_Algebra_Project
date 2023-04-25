@@ -1,43 +1,101 @@
 import numpy as np
 import itertools
 
-# Adjacency matrix
-# 1-2-3-4
-adj_mat = [[0, 1, 0, 0],
-           [1, 0, 1, 0],
-           [0, 1, 0, 1],
-           [0, 0, 1, 0]]
-
-# Adding intermediate nodes
-# Matrix dimension increases from n->n*(n-1)
-# def add_intermediate_nodes(adj_mat):
-#     n = len(adj_mat)
-#     adj_mat = np.array(adj_mat)
-#     adj_mat = np.kron(adj_mat, np.identity(n-1))
-#     adj_mat = np.kron(np.identity(n-1), adj_mat)
-#     return adj_mat
+# adj_mat = [[0, 1, 0, 0],
+#            [1, 0, 1, 0],
+#            [0, 1, 0, 1],
+#            [0, 0, 1, 0]]
 #
-# new_arr = add_intermediate_nodes(adj_mat)
-# print(new_arr.shape)
-n = len(adj_mat)
+# node_lst = [1, 2, 3, 4]
 
-b = [[0 for i in range(n-1)] for j in range(n)]
+# adj_mat = [[0, 0, 1, 0],
+#            [0, 0, 0, 1],
+#            [1, 0, 0, 0],
+#            [0, 1, 0, 0]]
+#
+# node_lst = [1, 2, 3, 4]
 
-arr = list((itertools.combinations(range(0, n), 2)))
+# adj_mat = [[0, 0, 1, 0, 0],
+#            [0, 0, 0, 0, 1],
+#            [1, 0, 0, 1, 0],
+#            [0, 0, 1, 0, 0],
+#            [0, 1, 0, 0, 0]]
+#
+# node_lst = [1, 2, 3, 4, 5]
 
-print(arr)
+node_lst = list(map(int, input("Enter nodes: ").split()))
 
-# b matrix will be in the form 0-1, 1-2, 2-3
+adj_mat = []
 
-arr_temp = []
+for i in node_lst:
+    while True:
+        r_lst = list(map(int, input(f"Enter adjacency list for node {i}: ").split()))
+        if len(r_lst) != len(node_lst):
+            print("Invalid adjacency list. Try again.")
+        else:
+            adj_mat.append(r_lst)
+            break
 
-for (i,j) in arr:
-    if adj_mat[i][j] == 1:
-        arr_temp.append([i,j])
+if len(adj_mat) != len(node_lst) or len(adj_mat[0]) != len(node_lst):
+    print("Invalid matrix")
+    exit()
 
-arr = arr_temp
+adj_mat = np.array(adj_mat)  # Convert adjacency matrix to numpy array
 
-print(arr)
+n = len(adj_mat)  # Number of nodes
 
-for i in range(len(arr)):
-    pass
+inter_node_lst = list((itertools.combinations(node_lst, 2)))  # List of all possible node pairs
+
+arr_temp = []  # Temporary array to store node pairs that are connected
+
+for (i, j) in inter_node_lst:
+    if adj_mat[node_lst.index(i)][node_lst.index(j)] == 1:
+        arr_temp.append([i, j])
+
+inter_node_lst = arr_temp  # Update inter_node_lst
+
+print(inter_node_lst)
+
+b = np.zeros((n, len(inter_node_lst)))  # B matrix
+b_dist = np.zeros((n, len(inter_node_lst)))  # B matrix for distance
+
+adj_dist = adj_mat.copy()  # A matrix for distance
+
+for (i, j) in inter_node_lst:  # Iterates through all node pairs
+    for k in node_lst:              # Iterates through all nodes
+        if k == i or k == j:            # If node is one of the nodes in the node pair
+            b[node_lst.index(k)][inter_node_lst.index([i, j])] = 1  # That node is connected to the node pair
+            b_dist[node_lst.index(k)][inter_node_lst.index([i, j])] = 1  # That node is connected to the node pair directly
+        else:
+            if adj_mat[node_lst.index(i)][node_lst.index(k)] == 0 and adj_mat[node_lst.index(j)][node_lst.index(k)] == 0:  # If both nodes in the node pair are not connected to the node k
+                b[node_lst.index(k)][inter_node_lst.index([i, j])] = 1
+                b_dist[node_lst.index(k)][inter_node_lst.index([i, j])] = 1
+                adj_dist[node_lst.index(i)][node_lst.index(k)] = 2
+                adj_dist[node_lst.index(j)][node_lst.index(k)] = 2
+                adj_dist[node_lst.index(k)][node_lst.index(i)] = 2
+                adj_dist[node_lst.index(k)][node_lst.index(j)] = 2
+
+            elif adj_mat[node_lst.index(i)][node_lst.index(k)] == 0:  # If only node i in the node pair is not connected to the node k
+                adj_dist[node_lst.index(i)][node_lst.index(k)] = 2
+                adj_dist[node_lst.index(k)][node_lst.index(i)] = 2
+                b_dist[node_lst.index(k)][inter_node_lst.index([i, j])] = 2
+
+            elif adj_mat[node_lst.index(j)][node_lst.index(k)] == 0:  # If only node j in the node pair is not connected to the node k
+                adj_dist[node_lst.index(j)][node_lst.index(k)] = 2
+                adj_dist[node_lst.index(k)][node_lst.index(j)] = 2
+                b_dist[node_lst.index(k)][inter_node_lst.index([i, j])] = 2
+
+print("\nB Matrix:\n", b)
+
+a_b = np.concatenate((adj_dist, b_dist), axis=1)
+print("\nA_B Matrix:\n", a_b)
+
+k_mat = (np.ones((len(inter_node_lst), len(inter_node_lst))) - np.identity(len(inter_node_lst))) * 2
+
+final_mat = np.concatenate((np.concatenate((adj_mat, b), axis=1),
+                            np.concatenate((b.T, np.zeros((len(inter_node_lst), len(inter_node_lst)))), axis=1)),
+                           axis=0)
+print("\nFinal Matrix:\n", final_mat.astype(int))
+
+final_dist_mat = np.concatenate((a_b, np.concatenate((b_dist.T, k_mat), axis=1)), axis=0)
+print("\nFinal Distance Matrix:\n", final_dist_mat.astype(int))
