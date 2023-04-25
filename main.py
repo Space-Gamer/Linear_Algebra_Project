@@ -1,12 +1,14 @@
 import numpy as np
 import itertools
 
-# adj_mat = [[0, 1, 0, 0],
-#            [1, 0, 1, 0],
-#            [0, 1, 0, 1],
-#            [0, 0, 1, 0]]
-#
-# node_lst = [1, 2, 3, 4]
+from graph_plot import draw_graph
+
+adj_mat = [[0, 1, 0, 0],
+           [1, 0, 1, 0],
+           [0, 1, 0, 1],
+           [0, 0, 1, 0]]
+
+node_lst = [1, 2, 3, 4]
 
 # adj_mat = [[0, 0, 1, 0],
 #            [0, 0, 0, 1],
@@ -23,24 +25,26 @@ import itertools
 #
 # node_lst = [1, 2, 3, 4, 5]
 
-node_lst = list(map(int, input("Enter nodes: ").split()))
-
-adj_mat = []
-
-for i in node_lst:
-    while True:
-        r_lst = list(map(int, input(f"Enter adjacency list for node {i}: ").split()))
-        if len(r_lst) != len(node_lst):
-            print("Invalid adjacency list. Try again.")
-        else:
-            adj_mat.append(r_lst)
-            break
-
-if len(adj_mat) != len(node_lst) or len(adj_mat[0]) != len(node_lst):
-    print("Invalid matrix")
-    exit()
+# node_lst = list(map(int, input("Enter nodes: ").split()))
+#
+# adj_mat = []
+#
+# for i in node_lst:
+#     while True:
+#         r_lst = list(map(int, input(f"Enter adjacency list for node {i}: ").split()))
+#         if len(r_lst) != len(node_lst):
+#             print("Invalid adjacency list. Try again.")
+#         else:
+#             adj_mat.append(r_lst)
+#             break
+#
+# if len(adj_mat) != len(node_lst) or len(adj_mat[0]) != len(node_lst):
+#     print("Invalid matrix")
+#     exit()
 
 adj_mat = np.array(adj_mat)  # Convert adjacency matrix to numpy array
+
+draw_graph(adj_mat, node_lst)
 
 n = len(adj_mat)  # Number of nodes
 
@@ -96,6 +100,9 @@ final_mat = np.concatenate((np.concatenate((adj_mat, b), axis=1),
                             np.concatenate((b.T, np.zeros((len(inter_node_lst), len(inter_node_lst)))), axis=1)),
                            axis=0)
 print("\nFinal Matrix:\n", final_mat.astype(int))
+
+new_node_lst = node_lst + [f"{i}, {j}" for (i, j) in inter_node_lst]
+draw_graph(final_mat, new_node_lst)
 
 final_dist_mat = np.concatenate((a_b, np.concatenate((b_dist.T, k_mat), axis=1)), axis=0)
 print("\nFinal Distance Matrix:\n", final_dist_mat.astype(int))
