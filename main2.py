@@ -85,6 +85,33 @@ def main(adj_mat=None, node_lst=None):
 
     print("Sorted node pairs: ", sorted_inter_node_lst)
 
+    additional_nodes = []
+
+    while dist_mat(adj_mat).max(axis=None) > 2:
+        i, j = sorted_inter_node_lst.pop(0)
+
+        # Adding a new node in adjacency matrix
+        new_adj_mat = np.zeros((len(adj_mat)+1, len(adj_mat)+1))  # Create a new array with one more row and column
+        new_adj_mat[:-1, :-1] = adj_mat  # Copy the old array into the new array
+        new_adj_mat[node_lst.index(i)][-1] = 1  # Connect new node to node i
+        new_adj_mat[-1][node_lst.index(i)] = 1  # Connect node i to new node
+        new_adj_mat[node_lst.index(j)][-1] = 1  # Connect new node to node j
+        new_adj_mat[-1][node_lst.index(j)] = 1  # Connect node j to new node
+        adj_mat = new_adj_mat  # Update adj_mat
+        additional_nodes.append([i, j])  # Add node pair to additional_nodes
+
+
+        for k in node_lst:
+            if k != i and k != j:  # If node is not in the node pair
+                if adj_mat[node_lst.index(i)][node_lst.index(k)] == 0 and adj_mat[node_lst.index(j)][node_lst.index(k)] == 0:  # If node is not connected to either node in the node pair
+                    adj_mat[node_lst.index(k)][-1] = 1  # Connect node to new node
+                    adj_mat[-1][node_lst.index(k)] = 1  # Connect new node to node
+
+        print(f"New adjacency matrix: \n{adj_mat}")
+        print("Maximum distance: ", dist_mat(adj_mat).max(axis=None))
+        new_node_lst = node_lst + [f"{i}, {j}" for (i, j) in additional_nodes]
+        draw_graph(adj_mat, new_node_lst)
+
 
 if __name__ == "__main__":
     n = int(input('Enter the number of nodes: '))
