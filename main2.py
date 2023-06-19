@@ -4,7 +4,6 @@ import itertools
 from graph_plot import draw_graph
 from fib_mat_gen import fib_mat_gen
 
-
 adj_mat = [[0, 1, 0, 0],
            [1, 0, 1, 0],
            [0, 1, 0, 1],
@@ -15,6 +14,7 @@ node_lst = [1, 2, 3, 4]
 
 def node_degree(adj_mat):
     return np.sum(adj_mat, axis=0)
+
 
 def single_node_degree(node, adj_mat):
     return np.sum(adj_mat[node])
@@ -32,7 +32,7 @@ def bfs_dist(node, adj_mat, visited, dist):
                 queue.append(i)
 
 
-def dist_mat(adj_mat): # Generates a distance matrix for a graph
+def dist_mat(adj_mat):  # Generates a distance matrix for a graph
     n = len(adj_mat)
     dist = np.zeros((n, n))
     for i in range(n):
@@ -73,7 +73,9 @@ def main(adj_mat=None, node_lst=None):
 
     # sorted_node_lst = sorted(node_lst, key=lambda x: single_node_degree(x-1, adj_mat))
 
-    sorted_inter_node_lst = sorted(list(itertools.combinations(node_lst, 2)), key=lambda x: single_node_degree(x[0]-1, adj_mat) + single_node_degree(x[1]-1, adj_mat))
+    sorted_inter_node_lst = sorted(list(itertools.combinations(node_lst, 2)), key=lambda x: (
+        single_node_degree(x[0] - 1, adj_mat) + single_node_degree(x[1] - 1, adj_mat),
+        min(single_node_degree(x[0] - 1, adj_mat), single_node_degree(x[1] - 1, adj_mat))))
 
     arr_temp = []  # Temporary array to store node pairs that are connected
 
@@ -91,7 +93,7 @@ def main(adj_mat=None, node_lst=None):
         i, j = sorted_inter_node_lst.pop(0)
 
         # Adding a new node in adjacency matrix
-        new_adj_mat = np.zeros((len(adj_mat)+1, len(adj_mat)+1))  # Create a new array with one more row and column
+        new_adj_mat = np.zeros((len(adj_mat) + 1, len(adj_mat) + 1))  # Create a new array with one more row and column
         new_adj_mat[:-1, :-1] = adj_mat  # Copy the old array into the new array
         new_adj_mat[node_lst.index(i)][-1] = 1  # Connect new node to node i
         new_adj_mat[-1][node_lst.index(i)] = 1  # Connect node i to new node
@@ -100,10 +102,10 @@ def main(adj_mat=None, node_lst=None):
         adj_mat = new_adj_mat  # Update adj_mat
         additional_nodes.append([i, j])  # Add node pair to additional_nodes
 
-
         for k in node_lst:
             if k != i and k != j:  # If node is not in the node pair
-                if adj_mat[node_lst.index(i)][node_lst.index(k)] == 0 and adj_mat[node_lst.index(j)][node_lst.index(k)] == 0:  # If node is not connected to either node in the node pair
+                if adj_mat[node_lst.index(i)][node_lst.index(k)] == 0 and adj_mat[node_lst.index(j)][node_lst.index(k)] \
+                        == 0:  # If node is not connected to either node in the node pair
                     adj_mat[node_lst.index(k)][-1] = 1  # Connect node to new node
                     adj_mat[-1][node_lst.index(k)] = 1  # Connect new node to node
 
@@ -117,4 +119,4 @@ if __name__ == "__main__":
     n = int(input('Enter the number of nodes: '))
     adj_mat = fib_mat_gen(n)
     node_lst = list(range(1, n + 1))
-    main(adj_mat, node_lst) # Only works when nodes are numbered from 1 to n
+    main(adj_mat, node_lst)  # Only works when nodes are numbered from 1 to n
