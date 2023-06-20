@@ -1,8 +1,10 @@
+import time
+
 import numpy as np
 import itertools
 
 from graph_plot import draw_graph
-from fib_mat_gen import fib_mat_gen
+from fib_mat_gen import fib_sum_mat_gen, fib_diff_mat_gen
 
 adj_mat = [[0, 1, 0, 0],
            [1, 0, 1, 0],
@@ -66,6 +68,8 @@ def main(adj_mat=None, node_lst=None):
 
     n = len(adj_mat)  # Number of nodes
 
+    max_deg = max(node_degree(adj_mat))  # Maximum degree of the graph
+
     # node_deg = node_degree(adj_mat)
     # print(f"Node degree: {node_deg}")
     #
@@ -82,6 +86,8 @@ def main(adj_mat=None, node_lst=None):
     for (i, j) in sorted_inter_node_lst:
         if adj_mat[node_lst.index(i)][node_lst.index(j)] == 1:
             arr_temp.append([i, j])
+            # if single_node_degree(i - 1, adj_mat) < max_deg and single_node_degree(j - 1, adj_mat) < max_deg:
+            #     arr_temp.append([i, j])
 
     sorted_inter_node_lst = arr_temp  # Update inter_node_lst
 
@@ -113,10 +119,15 @@ def main(adj_mat=None, node_lst=None):
         print("Maximum distance: ", dist_mat(adj_mat).max(axis=None))
         new_node_lst = node_lst + [f"{i}, {j}" for (i, j) in additional_nodes]
         draw_graph(adj_mat, new_node_lst)
+    print(format(len(node_lst), '03'), '|', format(len(additional_nodes), '02'))
 
 
 if __name__ == "__main__":
     n = int(input('Enter the number of nodes: '))
-    adj_mat = fib_mat_gen(n)
+    a = time.perf_counter()
+    adj_mat = fib_sum_mat_gen(n)
+    # adj_mat = fib_diff_mat_gen(n)
     node_lst = list(range(1, n + 1))
     main(adj_mat, node_lst)  # Only works when nodes are numbered from 1 to n
+    b = time.perf_counter()
+    print(f"Time taken: {round(b - a, 2)} seconds")

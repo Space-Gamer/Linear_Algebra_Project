@@ -14,8 +14,8 @@ def fib_check(n):
         return False
 
 
-def fib_mat_gen(n):  # Generates an adjacency matrix for a graph with n nodes which are connected if the sum of their
-    # labels is a Fibonacci number
+def fib_sum_mat_gen(n):  # Generates an adjacency matrix for a graph with n nodes which are connected if the sum of
+    # their labels is a Fibonacci number
     if n > 1:
         adj_mat = np.zeros((n, n))
         for i in range(1, n + 1):
@@ -23,7 +23,22 @@ def fib_mat_gen(n):  # Generates an adjacency matrix for a graph with n nodes wh
                 if fib_check(i + j):
                     adj_mat[i - 1][j - 1] = 1
                     adj_mat[j - 1][i - 1] = 1
-        print("Fibonacci adjacency matrix:" + "\n" + str(adj_mat))
+        # print("Fibonacci sum adjacency matrix:" + "\n" + str(adj_mat))
+        return adj_mat
+    else:
+        return [[0]]
+
+
+def fib_diff_mat_gen(n): # Generates an adjacency matrix for a graph with n nodes which are connected if the difference
+    # of their labels is a Fibonacci number
+    if n > 1:
+        adj_mat = np.zeros((n, n))
+        for i in range(1, n + 1):
+            for j in range(i + 1, n + 1):
+                if fib_check(abs(i - j)):
+                    adj_mat[i - 1][j - 1] = 1
+                    adj_mat[j - 1][i - 1] = 1
+        # print("Fibonacci difference adjacency matrix:" + "\n" + str(adj_mat))
         return adj_mat
     else:
         return [[0]]
