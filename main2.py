@@ -43,6 +43,21 @@ def dist_mat(adj_mat):  # Generates a distance matrix for a graph
     return dist
 
 
+def intersection_sort(curr_arr, prev_arr):
+    new_curr_arr = []
+    for j in prev_arr:
+        for k in range(len(curr_arr)):
+            try:
+                p, q = curr_arr[k]
+                if p in j or q in j:
+                    new_curr_arr.append(curr_arr[k])
+                    curr_arr.pop(k)
+            except IndexError:
+                pass
+    new_curr_arr.extend(curr_arr)
+    return new_curr_arr
+
+
 def main(adj_mat=None, node_lst=None):
     if adj_mat is None:
         node_lst = list(map(int, input("Enter nodes: ").split()))
@@ -85,11 +100,29 @@ def main(adj_mat=None, node_lst=None):
 
     for (i, j) in sorted_inter_node_lst:
         if adj_mat[node_lst.index(i)][node_lst.index(j)] == 1:
-            arr_temp.append([i, j])
-            # if single_node_degree(i - 1, adj_mat) < max_deg and single_node_degree(j - 1, adj_mat) < max_deg:
-            #     arr_temp.append([i, j])
+            # arr_temp.append([i, j])
+            if single_node_degree(i - 1, adj_mat) < max_deg and single_node_degree(j - 1, adj_mat) < max_deg:
+                arr_temp.append([i, j])
 
-    sorted_inter_node_lst = arr_temp  # Update inter_node_lst
+    # sorted_inter_node_lst = arr_temp  # Update inter_node_lst
+    print(arr_temp) # Debug
+
+    deg_sum = 0
+    arr_temp2 = []
+    sorted_inter_node_lst = []
+
+    for (i, j) in arr_temp:
+        arr_temp2.append([i, j])
+        if single_node_degree(i-1, adj_mat) + single_node_degree(j-1, adj_mat) > deg_sum:
+            if sorted_inter_node_lst:
+                arr_temp2 = intersection_sort(arr_temp2, sorted_inter_node_lst)
+            sorted_inter_node_lst.extend(arr_temp2)
+            arr_temp2 = []
+            deg_sum = single_node_degree(i-1, adj_mat) + single_node_degree(j-1, adj_mat) + 1
+        elif single_node_degree(i-1, adj_mat) + single_node_degree(j-1, adj_mat) == deg_sum:
+            continue
+        else:
+            deg_sum = single_node_degree(i-1, adj_mat) + single_node_degree(j-1, adj_mat)
 
     print("Sorted node pairs: ", sorted_inter_node_lst)
 
@@ -110,7 +143,7 @@ def main(adj_mat=None, node_lst=None):
 
         for k in node_lst:
             if k != i and k != j:  # If node is not in the node pair
-                if adj_mat[node_lst.index(i)][node_lst.index(k)] == 0 and adj_mat[node_lst.index(j)][node_lst.index(k)] \
+                if adj_mat[node_lst.index(i)][node_lst.index(k)] == 0 and adj_mat[node_lst.index(j)][node_lst.index(k)]\
                         == 0:  # If node is not connected to either node in the node pair
                     adj_mat[node_lst.index(k)][-1] = 1  # Connect node to new node
                     adj_mat[-1][node_lst.index(k)] = 1  # Connect new node to node
@@ -119,12 +152,13 @@ def main(adj_mat=None, node_lst=None):
         print("Maximum distance: ", dist_mat(adj_mat).max(axis=None))
         new_node_lst = node_lst + [f"{i}, {j}" for (i, j) in additional_nodes]
         draw_graph(adj_mat, new_node_lst)
-    print(format(len(node_lst), '03'), '|', format(len(additional_nodes), '02'))
+    print(format(len(node_lst), '02'), '|', format(len(additional_nodes), '02'))
 
 
 if __name__ == "__main__":
     n = int(input('Enter the number of nodes: '))
     a = time.perf_counter()
+    # for n in range(10, 100):
     adj_mat = fib_sum_mat_gen(n)
     # adj_mat = fib_diff_mat_gen(n)
     node_lst = list(range(1, n + 1))
