@@ -112,5 +112,14 @@ def main():
     print("Max distance between any two nodes:")
     print(dist_mat(adj_mat).max(axis=None))
 
+    # print number of each distance
+    dist = dist_mat(adj_mat)
+    dist = dist.astype(int).flatten().tolist()
+    freq = {i: dist.count(i) for i in dist}
+    print(freq)
+
+    # print average distance
+    print(f"Average distance between any two nodes: {round(np.mean(dist), 4)}")
+
 if __name__ == '__main__':
     main()
