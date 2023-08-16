@@ -1,5 +1,6 @@
 import itertools
 import sys
+import os
 
 import numpy as np
 
@@ -92,9 +93,9 @@ def main():
     adj_mat[0][8] = 1
     adj_mat[8][0] = 1
 
-    # 4, 30
-    adj_mat[4][30] = 1
-    adj_mat[30][4] = 1
+    # 4, 28
+    adj_mat[4][28] = 1
+    adj_mat[28][4] = 1
 
     # 12, 20
     adj_mat[12][20] = 1
@@ -107,10 +108,22 @@ def main():
     draw_graph(adj_mat)
 
     print("Distance Matrix written to file 'cyclohexane_dist_mat.txt'")
-    np.savetxt('cyclohexane_dist_mat.txt', dist_mat(adj_mat), fmt='%d')
+    np.savetxt('Chemical Structures/outputs/cyclohexane_dist_mat.txt', dist_mat(adj_mat), fmt='%d')
 
     print("Max distance between any two nodes:")
     print(dist_mat(adj_mat).max(axis=None))
+
+    # print number of each distance
+    dist = dist_mat(adj_mat)
+    # Remove intermediate nodes from distance matrix
+    dist = np.delete(dist, [6, 7, 14, 15, 22, 23, 30, 31], axis=0) # Remove rows
+    dist = np.delete(dist, [6, 7, 14, 15, 22, 23, 30, 31], axis=1) # Remove columns
+    print("New distance matrix:")
+    print(dist)
+    import pickle
+    filee = open('Chemical Structures/outputs/cyclohexane_dist_mat_modified.bin','wb') # The added nodes removed for comparision
+    pickle.dump(dist, filee)
+    filee.close()
 
     # print number of each distance
     dist = dist_mat(adj_mat)

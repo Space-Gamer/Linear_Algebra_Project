@@ -107,7 +107,7 @@ def main():
     draw_graph(adj_mat)
 
     print("Distance Matrix written to file 'cyclohexane_dist_mat_without_intermediate_pts.txt'")
-    np.savetxt('cyclohexane_dist_mat_without_intermediate_pts.txt', dist_mat(adj_mat), fmt='%d')
+    np.savetxt('Chemical Structures/outputs/cyclohexane_dist_mat_without_intermediate_pts.txt', dist_mat(adj_mat), fmt='%d')
 
     print("Max distance between any two nodes:")
     print(dist_mat(adj_mat).max(axis=None))
@@ -120,6 +120,13 @@ def main():
 
     # print average distance
     print(f"Average distance between any two nodes: {round(np.mean(dist), 4)}")
+
+    print(dist_mat(adj_mat))
+
+    import pickle
+    filee = open('Chemical Structures/outputs/cyclohexane_dist_mat_without_intermediate_pts.bin','wb')
+    pickle.dump(dist_mat(adj_mat), filee)
+    filee.close()
 
 if __name__ == '__main__':
     main()
