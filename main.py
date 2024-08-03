@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 
 from graph_plot import draw_graph
-from fib_mat_gen import fib_mat_gen
+from fib_mat_gen import fib_sum_mat_gen
 
 adj_mat = [[0, 1, 0, 0],
            [1, 0, 1, 0],
@@ -119,6 +119,6 @@ def main(adj_mat=None, node_lst=None):
 
 if __name__ == "__main__":
     n = int(input('Enter the number of nodes: '))
-    adj_mat = fib_mat_gen(n)
+    adj_mat = fib_sum_mat_gen(n)
     node_lst = list(range(1, n + 1))
     main(adj_mat, node_lst)
